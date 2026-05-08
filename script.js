@@ -96,17 +96,25 @@ document.addEventListener('DOMContentLoaded', () => {
                 })
             });
 
+            const data = await response.json();
+
             if (!response.ok) {
-                throw new Error('API 호출에 실패했습니다.');
+                console.error('API 응답 에러:', data);
+                throw new Error(data.error?.message || 'API 호출에 실패했습니다.');
             }
 
-            const data = await response.json();
-            const aiText = data.candidates[0].content.parts[0].text;
-            return aiText;
+            // 응답 구조 확인 및 텍스트 추출
+            if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
+                const aiText = data.candidates[0].content.parts[0].text;
+                return aiText;
+            } else {
+                console.error('예상치 못한 응답 구조:', data);
+                return "마음을 분석하는 중에 조금 복잡한 일이 생겼나 봐요. 잠시 후 다시 시도해 주시겠어요?";
+            }
 
         } catch (error) {
-            console.error('Gemini API Error:', error);
-            return "죄송해요, 잠시 마음을 정리할 시간이 필요해요. 잠시 후 다시 말을 걸어주시겠어요? (에러가 발생했습니다)";
+            console.error('Gemini API 상세 에러:', error);
+            return `죄송해요, 연결에 문제가 발생했어요. (${error.message})`;
         }
     };
 
