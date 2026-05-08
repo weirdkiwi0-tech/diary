@@ -88,7 +88,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             if (!response.ok) {
                 console.error('서버 응답 에러:', data);
-                throw new Error(data.error || '상담사와 연결하는 중에 문제가 생겼어요.');
+                // 에러 메시지 추출 로직 개선 ([object Object] 방지)
+                const errorMessage = data.error?.message || data.error || '상담사와 연결하는 중에 문제가 생겼어요.';
+                throw new Error(typeof errorMessage === 'object' ? JSON.stringify(errorMessage) : errorMessage);
             }
 
             // 응답 구조 확인 및 텍스트 추출
