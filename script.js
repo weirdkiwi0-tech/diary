@@ -73,7 +73,7 @@ document.addEventListener('DOMContentLoaded', () => {
      * 현재는 교육용 목적으로 직접 포함하였습니다.
      */
     const GEMINI_API_KEY = "AIzaSyBGCrhHoHWqp8ToJY_CBUm6m-MlCpJBAuY";
-    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${GEMINI_API_KEY}`;
+    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
 
     const generateAIResponse = async (userText) => {
         if (!userText.trim()) return "먼저 당신의 이야기를 조금만 들려주시겠어요? 어떤 사소한 이야기라도 좋아요.";
