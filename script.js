@@ -135,4 +135,14 @@ document.addEventListener('DOMContentLoaded', () => {
         aiBtn.disabled = false;
         aiBtn.innerHTML = '<span class="icon">✨</span> AI 상담사';
     });
+
+    // --- [3. 엔터 키 이벤트 추가] ---
+    // 엔터 키를 누르면 버튼을 클릭한 것과 동일하게 작동하도록 함
+    diaryInput.addEventListener('keydown', (event) => {
+        // Shift + Enter는 줄바꿈으로 허용하고, Enter만 눌렀을 때 실행
+        if (event.key === 'Enter' && !event.shiftKey) {
+            event.preventDefault(); // 기본 줄바꿈 방지
+            aiBtn.click(); // AI 상담사 버튼 클릭 이벤트 트리거
+        }
+    });
 });
