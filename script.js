@@ -63,44 +63,32 @@ document.addEventListener('DOMContentLoaded', () => {
         console.warn('이 브라우저는 음성 인식을 지원하지 않습니다.');
     }
 
-    // --- [2. Gemini API 설정 및 AI 상담사 답변 로직] ---
+    // --- [2. AI 상담사 답변 로직 (보안 강화 버전)] ---
     
     /**
-     * [보안 주의사항]
-     * 아래 API 키는 클라이언트 측 코드(JavaScript)에 직접 노출되어 있습니다.
-     * 실제 서비스 배포 시에는 반드시 백엔드 서버를 거쳐서 호출하거나, 
-     * 환경 변수 및 보안 프록시를 사용하여 키가 외부에 노출되지 않도록 해야 합니다.
-     * 현재는 교육용 목적으로 직접 포함하였습니다.
+     * [보안 업데이트]
+     * API 키를 프론트엔드 코드에서 완전히 제거했습니다.
+     * 이제 모든 요청은 /api/consult 서버리스 함수를 통해 안전하게 전달됩니다.
+     * API 키는 Vercel 대시보드의 Environment Variables에서 관리됩니다.
      */
-    const GEMINI_API_KEY = "AIzaSyBGCrhHoHWqp8ToJY_CBUm6m-MlCpJBAuY";
-    const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
-
     const generateAIResponse = async (userText) => {
         if (!userText.trim()) return "먼저 당신의 이야기를 조금만 들려주시겠어요? 어떤 사소한 이야기라도 좋아요.";
 
-        // 시스템 프롬프트 설정
-        const systemPrompt = "너는 고등학생 전문 상담사야. 일기를 읽고 감정을 한 단어로 표현해줘. 그 다음 공감과 따뜻한 위로가 담긴 메시지를 2~3문장으로 작성해줘. 답변 형식 예시: [감정: 행복] 오늘 정말 멋진 하루를 보내셨군요! 당신의 노력이 결실을 맺은 것 같아 저도 기뻐요. 내일도 이 행복한 기운이 이어지길 응원할게요.";
-
         try {
-            const response = await fetch(GEMINI_API_URL, {
+            // 외부 API가 아닌, 우리가 만든 내부 API(/api/consult)를 호출합니다.
+            const response = await fetch('/api/consult', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                body: JSON.stringify({
-                    contents: [{
-                        parts: [{
-                            text: `${systemPrompt}\n\n사용자 일기: ${userText}`
-                        }]
-                    }]
-                })
+                body: JSON.stringify({ userText })
             });
 
             const data = await response.json();
 
             if (!response.ok) {
-                console.error('API 응답 에러:', data);
-                throw new Error(data.error?.message || 'API 호출에 실패했습니다.');
+                console.error('서버 응답 에러:', data);
+                throw new Error(data.error || '상담사와 연결하는 중에 문제가 생겼어요.');
             }
 
             // 응답 구조 확인 및 텍스트 추출
@@ -113,7 +101,7 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
         } catch (error) {
-            console.error('Gemini API 상세 에러:', error);
+            console.error('디버깅 정보:', error);
             return `죄송해요, 연결에 문제가 발생했어요. (${error.message})`;
         }
     };
